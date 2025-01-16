@@ -5,24 +5,24 @@ Here are explanations and examples for various date functions in MySQL like `hir
 This refers to a column or field in a table that stores the date an employee was hired. It is typically defined as a `DATE` data type in the table.
 
 Example:
-```sql
+
 CREATE TABLE employees (
     employee_id INT PRIMARY KEY,
     employee_name VARCHAR(100),
     hire_date DATE
 );
-```
+
 You can then insert a record with a `hire_date` value like so:
-```sql
+
 INSERT INTO employees (employee_id, employee_name, hire_date)
 VALUES (1, 'John Doe', '2020-05-15');
-```
+
 
 ### 2. `DATE_FORMAT`
 This function is used to format a date into a specific format.
 
 #### Syntax:
-```sql
+
 DATE_FORMAT(date, format)
 ```
 
@@ -79,7 +79,7 @@ MAKEDATE(year, day)
 ```
 
 #### Example:
-```sql
+
 SELECT MAKEDATE(2023, 150) AS made_date;
 ```
 **Output**: Returns `2023-05-30`, which is the 150th day of the year 2023.
@@ -88,7 +88,7 @@ SELECT MAKEDATE(2023, 150) AS made_date;
 This function is used to add a time interval (like days, months, etc.) to a date.
 
 #### Syntax:
-```sql
+
 DATE_ADD(date, INTERVAL value unit)
 ```
 
@@ -103,7 +103,7 @@ FROM employees;
 
 ### Combined Example:
 
-```sql
+
 SELECT 
     employee_name,
     hire_date,
@@ -122,3 +122,73 @@ FROM employees;
 - `hire_year` and `hire_month`: Extracted year and month from the `hire_date`.
 - `made_date`: The 100th day of the year 2023.
 - `date_after_5_years`: The date 5 years after the `hire_date`.
+
+
+In MySQL, both `TIMESTAMPDIFF()` and `DATEDIFF()` are used to calculate the difference between two dates or date-time values. However, they serve slightly different purposes.
+
+### 1. **`TIMESTAMPDIFF()` Function:**
+
+The `TIMESTAMPDIFF()` function is used to calculate the difference between two date or date-time values, and it returns the result in the specified unit (such as year, month, day, hour, minute, second).
+
+#### Syntax:
+
+TIMESTAMPDIFF(unit, datetime1, datetime2)
+```
+
+- **`unit`**: This specifies the unit of measurement for the result (such as `YEAR`, `MONTH`, `DAY`, `HOUR`, `MINUTE`, `SECOND`, etc.).
+- **`datetime1`**: The first date or datetime value.
+- **`datetime2`**: The second date or datetime value.
+
+#### Example:
+```sql
+SELECT TIMESTAMPDIFF(YEAR, '2020-01-01', '2025-01-01');
+```
+- This will return `5`, because there is a 5-year difference between the two dates.
+
+#### Units available for `unit`:
+- `YEAR`: Returns the difference in years.
+- `MONTH`: Returns the difference in months.
+- `DAY`: Returns the difference in days.
+- `HOUR`: Returns the difference in hours.
+- `MINUTE`: Returns the difference in minutes.
+- `SECOND`: Returns the difference in seconds.
+
+#### Example (in months):
+```sql
+SELECT TIMESTAMPDIFF(MONTH, '2020-01-01', '2025-01-01');
+```
+This will return `60` months (5 years × 12 months).
+
+### 2. **`DATEDIFF()` Function:**
+
+The `DATEDIFF()` function is used to calculate the number of days between two dates. It returns the difference as an integer representing the number of days.
+
+#### Syntax:
+```sql
+DATEDIFF(date1, date2)
+```
+
+- **`date1`**: The first date.
+- **`date2`**: The second date.
+
+#### Example:
+```sql
+SELECT DATEDIFF('2025-01-01', '2020-01-01');
+```
+- This will return `1826`, which is the number of days between the two dates.
+
+The result is simply the difference in days, and it does not take into account months or years directly.
+
+### Key Differences:
+- `TIMESTAMPDIFF()` allows you to specify the unit (such as years, months, or days) in which you want to measure the difference between two dates.
+- `DATEDIFF()` only measures the difference in **days** between two dates.
+  
+### Use Cases:
+- **`TIMESTAMPDIFF()`** is ideal when you need the difference in a specific unit like years, months, or even hours.
+- **`DATEDIFF()`** is useful when you simply need the number of days between two dates.
+
+### Example with Both Functions:
+If we calculate the difference between '2020-01-01' and '2025-01-01':
+
+- `TIMESTAMPDIFF(YEAR, '2020-01-01', '2025-01-01')` will return `5` years.
+- `DATEDIFF('2025-01-01', '2020-01-01')` will return `1826` days.

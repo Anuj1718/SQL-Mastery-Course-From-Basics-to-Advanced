@@ -269,3 +269,5 @@ WHERE
     age NOT BETWEEN 30 AND 50;  -- Exclude employees working in age 30 to 50
 
 drop table der_data
+
+select concat(upper("anuj"), substr("helloworld",6,5)) -- nested functions
