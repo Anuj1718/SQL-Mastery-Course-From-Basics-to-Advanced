@@ -53,7 +53,6 @@ INSERT INTO employee(FirstName, LastName, Age, Salary, Location) VALUES
   ("Matthew", "Williams", 45, 110000, "IT");
 SELECT * FROM employee;
 
-
 -- Filtering Records using WHERE Clause
 SELECT * FROM employee WHERE Salary > 100000;
 
