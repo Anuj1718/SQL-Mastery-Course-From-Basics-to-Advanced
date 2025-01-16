@@ -6,30 +6,35 @@ SELECT database(); -- to find out which database is currently being used
 
 -- creating the table employee
 CREATE TABLE employee(
-	EID			INT PRIMARY KEY,
+	EID			INT PRIMARY KEY, 
     FirstName 	varchar(50) NOT NULL,
     LastName 	varchar(50) NOT NULL,
     Age 		INT NOT NULL,
     Salary 		INT NOT NULL,
-    Location 	varchar(50) NOT NULL,
+    Location 	varchar(50) NOT NULL
     -- remove it before running
-    PRIMARY KEY(EID), -- we can also apply key constraints this way but this way is used to describe the composite key constains for weak entity let's see
-    PRIMARY KEY(EID,FirstName)
+  --   PRIMARY KEY(EID), -- we can also apply key constraints this way but this way is used to describe the composite key constains for weak entity let's see
+--     PRIMARY KEY(EID,FirstName)
     -- remove it before running
 );
 
 CREATE TABLE employee(
-	EID			INT AUTO_INCREMENT,
+	EID			INT AUTO_INCREMENT, -- datatype constraint then stuff like AUTO_INCREMENT
     FirstName 	varchar(50) NOT NULL,
     LastName 	varchar(50) NOT NULL,
     Age 		INT NOT NULL,
     Salary 		INT NOT NULL,
     Location 	varchar(50) NOT NULL,
-    PRIMARY KEY(EID)
-);
+    PRIMARY KEY(EID) -- OR INT PRIMARY KEY AUTO_INCREMENT
+); -- Error Code: 1075. If not given primary key or unique with AUTO_INCREMENT, Incorrect table definition; there can be only one auto column and it must be defined as a key, occurs because MySQL expects the AUTO_INCREMENT column to be a key column (usually a PRIMARY KEY or a UNIQUE key).
+
 DESC employee; -- shows the schema of the table like attributes, domain and constraints details
 DROP TABLE employee; -- Delete the table
 SHOW TABLES; -- show all tables inside the selected database
+describe employee; -- same as desc
+explain employee; -- same as desc
+
+-- DDL CARDT, DML SIDUM
  
 # insertion of entities inside the table
 INSERT INTO employee VALUES(,"Monu","KD",20,127001,"Delhi"); -- get error
@@ -64,11 +69,11 @@ SELECT * FROM employee WHERE Age > 25;
 -- Question_2 : Update the Jhon's LastName to Wick? 
 UPDATE employee SET LastName = 'Wick' WHERE EID = 3;
 SELECT * FROM employee WHERE EID = 3;
--- Note : use UPDATE commands with PRIMARY KEY only cause seletion must be done through unique identifiers for no future regrets!
+-- Note : use UPDATE commands with PRIMARY KEY only cause selection must be done through unique identifiers for no future regrets!
 
 -- Question_3 : Difference B/W UPDATE and ALTER command?
 -- Answer : UPDATE is DML command and ALTER is DDL command 
-		 -- works of record level  |  works on schema level
+		 -- works on record level  |  works on schema level
          
 -- Question_4 : Delet any record using EID?
 DELETE FROM employee WHERE EID = 4;

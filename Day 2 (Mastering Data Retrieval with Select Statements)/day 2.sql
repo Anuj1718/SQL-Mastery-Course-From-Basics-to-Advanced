@@ -86,6 +86,7 @@ select * from learners;
 SELECT COUNT(LearnerID) as Jan_Enrollments 
 FROM learners 
 WHERE LearnerEnrollmentDate = '2024-01-21
+
 -- today's targets
 -- 1. strong entity
 -- 2. weak entity
@@ -218,4 +219,8 @@ SELECT * FROM learners;
     -- so for that we use DISTINCT
 	SELECT COUNT(DISTINCT LearnerCompany) as Company_Count FROM learners;
 
-SELECT COUNT(LearnerID) as Jan_Enrollments FROM learners WHERE TIMESTAMP(LearnerEnrollmentDate) LIKE '%-01-05%';
+SELECT COUNT(LearnerID) as Jan_Enrollments FROM learners WHERE TIMESTAMP(LearnerEnrollmentDate) LIKE '%-01-05%'; -- timestamp -> syntax -> 'YYYY-MM-DD HH:MM:SS'
+SELECT COUNT(LearnerID) as Jan_Enrollments FROM learners WHERE DATE(LearnerEnrollmentDate) LIKE '%-01-05'; -- date -> syntax -> 'YYYY-MM-DD'
+SELECT COUNT(LearnerID) as Jan_Enrollments FROM learners WHERE LearnerEnrollmentDate LIKE '%-01-05%';  -- same as first
+
+SELECT * from learners WHERE DATE(LearnerEnrollmentDate) BETWEEN '2023-01-05' AND '2024-01-15'; -- records between date 5 jan to 15 jan

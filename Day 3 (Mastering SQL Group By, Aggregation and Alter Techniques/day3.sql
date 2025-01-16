@@ -53,8 +53,9 @@ GROUP BY SourceOfJoining
 HAVING SOurceofjoining='LiNkedIn' 
 -- never apply where clause after group by for filteration, before you can use
 
--- logical operators : and, or, not, between
+-- logical operators : and, or, not, ( between is a comparison operator )
 -- Display the course which does not include "Excel"
+
 SELECT * from courses
 -- select * from courses where coursename != "excel"; this does not give what i want
 select * from courses where coursename not like "%Excel%"
@@ -74,8 +75,9 @@ select * from learners where yearsofexperience < 4 or sourceofjoining="youtube" 
 DESC employee
 ALTER TABLE employee ADD column jobPosition varchar(50)
 ALTER TABLE employee MODIFY column firstname varchar(40)
--- ALTER TABLE employee DROP PRIMARY KEY;
-ALTER TABLE employee MODIFY EID INT;
+-- ALTER TABLE employee DROP PRIMARY KEY;  Error Code: 1075. Incorrect table definition; there can be only one auto column and it must be defined as a key
+
+ALTER TABLE employee MODIFY EID INT; -- removes auto_increment
 ALTER TABLE employee DROP PRIMARY KEY;
 ALTER TABLE employee ADD PRIMARY KEY (EID);
 ALTER TABLE employee DROP column jobPosition
