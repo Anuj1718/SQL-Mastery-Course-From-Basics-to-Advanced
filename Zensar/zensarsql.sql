@@ -229,4 +229,3 @@ SELECT
 -- USER(): This is a system function that returns the current MySQL user name and host name.
 -- CURRENT_USER(): This is a system function that returns the authenticated user for the current MySQL connection (the user who logged in)
 
--- any ddl is auto-commit, i.e permanent changes, hence data work (DML) is earlier done and then object (views, triggers, etc) work is done
