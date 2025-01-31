@@ -68,6 +68,8 @@
 -- | `LENGTH()`| Length of string           | `SELECT LENGTH('Hello');` (result: 5) |
 -- | `SUBSTRING()` | Extract part of a string | `SELECT SUBSTRING('Hello', 1, 3);` (result: 'Hel') |
 
+
+
 -- ### 6. **Null-safe Operators**
 -- Used for handling `NULL` values.
 
@@ -210,18 +212,41 @@ WHERE LastName LIKE '__e%';
 -- e: The third character must be "e".
 -- %: The remaining characters (if any) after the third position can be anything
 
-select power(2,4), truncate(123.456,1), round(123.456,1); -- This function truncates the decimal part of the number to the specified number of decimal places. It does not round the number; it simply removes digits after the specified decimal place.
+-- number functions 
+SELECT 
+    ABS(-15.78) AS Absolute_Value,      -- Absolute value of -15.78: Returns 15.78 because ABS removes the negative sign.
+    CEIL(7.3) AS Ceil_Value,            -- Ceiling value of 7.3: Returns 8 because CEIL rounds the number up to the nearest integer.(smallest integer greater than or equal to the number.)
+    FLOOR(7.9) AS Floor_Value,          -- Floor value of 7.9: Returns 7 because FLOOR rounds the number down to the nearest integer. (largest integer less than or equal to the number.)
+    SQRT(16) AS Square_Root,            -- Square root of 16: Returns 4 because the square root of 16 is 4.
+    ROUND(15.678, 2) AS Rounded_Value,  -- Rounded value of 15.678 to 2 decimal places: Returns 15.68 because it rounds to the nearest 2 decimal places.
+    TRUNCATE(15.678, 2) AS Truncated_Value, -- Truncates 15.678 to 2 decimal places: Returns 15.67 because TRUNCATE cuts off extra decimal places without rounding.
+    POWER(2, 3) AS Power_Value;         -- 2 raised to the power of 3: Returns 8 because 2^3 equals 8.
 
 -- Built-In String functions
 SELECT 
-    LENGTH('Hello World') AS Length,
-    CONCAT('Hello', ' ', 'World') AS Concatenated,
-    LOWER('HELLO') AS Lowercase,
-    UPPER('hello') AS Uppercase,
-    LEFT('Hello World', 5) AS LeftSubstring, --  returns the leftmost 5 characters from the string.
-    RIGHT('Hello World', 5) AS RightSubstring,
-    SUBSTRING('Hello World', 7, 5) AS Substring; -- 7 is starting position and 5 is how much characters to extract
-    
+    LENGTH('Hello World') AS Length,  -- Returns the length of the string 'Hello World' (output: 11)
+    CONCAT('Hello', ' ', 'World') AS Concatenated,  -- Concatenates 'Hello', ' ', and 'World' (output: 'Hello World')
+    LOWER('HELLO') AS Lowercase,  -- Converts 'HELLO' to lowercase (output: 'hello')
+    UPPER('hello') AS Uppercase,  -- Converts 'hello' to uppercase (output: 'HELLO')
+    LEFT('Hello World', 5) AS LeftSubstring,  -- Returns the leftmost 5 characters of 'Hello World' (output: 'Hello')
+    RIGHT('Hello World', 5) AS RightSubstring,  -- Returns the rightmost 5 characters of 'Hello World' (output: 'World')
+    SUBSTRING('Hello World', 7, 5) AS Substring;  -- Extracts 5 characters starting from the 7th position (output: 'World')
+
+-- Padding functions: LPAD and RPAD
+SELECT LPAD('123', 5, '0');  -- Pads '123' to the left to make the string 5 characters long by adding '0's (output: '00123')
+
+SELECT RPAD('123', 5, '0');  -- Pads '123' to the right to make the string 5 characters long by adding '0's (output: '12300')
+
+-- TRIM function
+SELECT TRIM('  Hello World  ');  -- Removes leading and trailing spaces from '  Hello World  ' (output: 'Hello World')
+
+
+SELECT TRIM(LEADING 'A' FROM 'AAHello World'),
+TRIM(TRAILING 'A' FROM 'Hello WorldAAA'),
+TRIM(BOTH 'A' FROM 'AHello WorldA'),
+TRIM('A' FROM 'AHello WorldA'); -- by default, both
+
+
     -- System functions
     SELECT VERSION(), USER(), current_user()  
     
@@ -229,3 +254,20 @@ SELECT
 -- USER(): This is a system function that returns the current MySQL user name and host name.
 -- CURRENT_USER(): This is a system function that returns the authenticated user for the current MySQL connection (the user who logged in)
 
+-- create table which has sum,max,min,avg count of employee salaries for the employee working in age other than 30 to 50
+CREATE TABLE DER_DATA 
+AS
+SELECT 
+    SUM(salary) AS Total_Salary,         -- Sum of all employee salaries
+    MAX(salary) AS Max_Salary,           -- Maximum salary
+    MIN(salary) AS Min_Salary,           -- Minimum salary
+    AVG(salary) AS Avg_Salary,           -- Average salary
+    COUNT(salary) AS Employee_Count      -- Total count of employees
+FROM 
+    employee
+WHERE 
+    age NOT BETWEEN 30 AND 50;  -- Exclude employees working in age 30 to 50
+
+drop table der_data
+
+select concat(upper("anuj"), substr("helloworld",6,5)) -- nested functions

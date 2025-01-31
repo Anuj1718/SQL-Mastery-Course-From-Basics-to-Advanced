@@ -1,0 +1,260 @@
+package final_project;
+import java.sql.*;
+import java.util.Scanner;
+
+public class Eduverse {
+    private static final String URL = "jdbc:mysql://localhost:3306/eduverse";
+    private static final String USER = "root";
+    private static final String PASSWORD = "@Bdevilliers1718";
+    private static Connection conn;
+    private static Scanner scanner = new Scanner(System.in);
+    private static int loggedInUserId = -1;
+
+    public static void main(String[] args) {
+        try {
+            conn = DriverManager.getConnection(URL, USER, PASSWORD);
+            System.out.println("Connected to database successfully!");
+            mainMenu();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void mainMenu() {
+        while (true) {
+            System.out.println("===================================================================");
+            System.out.println("|\t\t\t\tEduverse\t\t\t\t|");
+            System.out.println("                    Online Learning Platform                   ");
+            System.out.println("===================================================================");
+            System.out.println("1. Login");
+            System.out.println("2. Signup");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (choice) {
+                case 1: login(); break;
+                case 2: signup(); break;
+                case 3: System.exit(0);
+                default: System.out.println("Invalid choice! Try again.");
+            }
+        }
+    }
+
+    private static void login() {
+        System.out.print("Enter email: ");
+        String email = scanner.nextLine();
+        System.out.print("Enter password: ");
+        String password = scanner.nextLine();
+
+        try {
+            String query = "SELECT user_id, user_name FROM User WHERE user_email = ? AND user_password = ?";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, email);
+            stmt.setString(2, password);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                loggedInUserId = rs.getInt("user_id");
+                String userName = rs.getString("user_name");
+                System.out.println("Login successful! Welcome, " + userName);
+                courseMenu();
+            } else {
+                System.out.println("Invalid credentials! Try again.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void signup() {
+        System.out.print("Enter your name: ");
+        String name = scanner.nextLine();
+        System.out.print("Enter your email: ");
+        String email = scanner.nextLine();
+        System.out.print("Enter your password: ");
+        String password = scanner.nextLine();
+
+        try {
+            String query = "INSERT INTO User (user_name, user_email, user_password) VALUES (?, ?, ?)";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, name);
+            stmt.setString(2, email);
+            stmt.setString(3, password);
+            stmt.executeUpdate();
+            System.out.println("Signup successful! You can now login.");
+        } catch (SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    private static void courseMenu() {
+        while (true) {
+            System.out.println("\nCourse Menu");
+            System.out.println("1. View Available Courses");
+            System.out.println("2. Enroll in a Course");
+            System.out.println("3. View Enrolled Courses");
+            System.out.println("4. Logout");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (choice) {
+                case 1: viewCourses(); break;
+                case 2: enrollCourse(); break;
+                case 3: viewEnrolledCourses(); break;
+                case 4: loggedInUserId = -1; return;
+                default: System.out.println("Invalid choice! Try again.");
+            }
+        }
+    }
+
+    private static void viewCourses() {
+        try {
+            String query = "SELECT * FROM Course";
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+
+            System.out.println("Available Courses:");
+            System.out.println("-------------------------------------------------------------------------------------------------------------------");
+            System.out.printf("| %-3s | %-30s | %-10s | %-10s | %-20s |\n", "ID", "Course Name", "Category", "Price", "Instructor");
+            System.out.println("-------------------------------------------------------------------------------------------------------------------");
+            while (rs.next()) {
+                int courseId = rs.getInt("course_id");
+                String courseName = rs.getString("course_name");
+                String category = rs.getString("category");
+                double price = rs.getDouble("price");
+                String instructor = rs.getString("instructor_name");
+
+                System.out.printf("| %-3d | %-30s | %-10s | $%-9.2f | %-20s |\n", 
+                                  courseId, courseName, category, price, instructor);
+            }
+            System.out.println("-------------------------------------------------------------------------------------------------------------------");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void enrollCourse() {
+        if (loggedInUserId == -1) {
+            System.out.println("You must be logged in to enroll in a course.");
+            return;
+        }
+
+        System.out.print("Enter course ID to enroll: ");
+        int courseId = scanner.nextInt();
+        scanner.nextLine();
+
+        try {
+            // Get course price
+            String courseQuery = "SELECT price FROM Course WHERE course_id = ?";
+            PreparedStatement courseStmt = conn.prepareStatement(courseQuery);
+            courseStmt.setInt(1, courseId);
+            ResultSet courseRs = courseStmt.executeQuery();
+
+            if (!courseRs.next()) {
+                System.out.println("Course not found.");
+                return;
+            }
+            double price = courseRs.getDouble("price");
+
+            // Create enrollment
+            String enrollQuery = "INSERT INTO Enrollment (user_id, course_id) VALUES (?, ?)";
+            PreparedStatement enrollStmt = conn.prepareStatement(enrollQuery, Statement.RETURN_GENERATED_KEYS);
+            enrollStmt.setInt(1, loggedInUserId);
+            enrollStmt.setInt(2, courseId);
+            enrollStmt.executeUpdate();
+
+            // Get generated enrollment ID
+            ResultSet generatedKeys = enrollStmt.getGeneratedKeys();
+            if (!generatedKeys.next()) {
+                System.out.println("Failed to enroll in course.");
+                return;
+            }
+            int enrollmentId = generatedKeys.getInt(1);
+
+            // Select payment method
+            System.out.println("Select payment method:");
+            System.out.println("1. COD");
+            System.out.println("2. Credit Card");
+            System.out.println("3. Debit Card");
+            System.out.println("4. Coupon");
+            System.out.print("Enter your choice: ");
+            int pmtChoice = scanner.nextInt();
+            scanner.nextLine();
+
+            String paymentMethod = "";
+            switch (pmtChoice) {
+                case 1: paymentMethod = "COD"; break;
+                case 2: paymentMethod = "Credit Card"; break;
+                case 3: paymentMethod = "Debit Card"; break;
+                case 4: paymentMethod = "Coupon"; break;
+                default:
+                    System.out.println("Invalid choice. Using COD.");
+                    paymentMethod = "COD";
+            }
+
+            // Create payment
+            String paymentQuery = "INSERT INTO Payment (enrollment_id, payment_method, amount) VALUES (?, ?, ?)";
+            PreparedStatement paymentStmt = conn.prepareStatement(paymentQuery);
+            paymentStmt.setInt(1, enrollmentId);
+            paymentStmt.setString(2, paymentMethod);
+            paymentStmt.setDouble(3, price);
+            paymentStmt.executeUpdate();
+
+            // Update enrollment status
+            String updateQuery = "UPDATE Enrollment SET payment_status = 'Completed' WHERE enrollment_id = ?";
+            PreparedStatement updateStmt = conn.prepareStatement(updateQuery);
+            updateStmt.setInt(1, enrollmentId);
+            updateStmt.executeUpdate();
+
+            System.out.println("Enrollment successful! Payment completed via " + paymentMethod);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void viewEnrolledCourses() {
+        if (loggedInUserId == -1) {
+            System.out.println("You must be logged in to view enrolled courses.");
+            return;
+        }
+
+        try {
+            String query = "SELECT C.course_name, C.category, E.enrollment_date, E.payment_status, P.payment_method, P.amount " +
+                           "FROM Enrollment E " +
+                           "JOIN Course C ON E.course_id = C.course_id " +
+                           "LEFT JOIN Payment P ON E.enrollment_id = P.enrollment_id " +
+                           "WHERE E.user_id = ?";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setInt(1, loggedInUserId);
+            ResultSet rs = stmt.executeQuery();
+
+            System.out.println("Enrolled Courses:");
+            System.out.println("--------------------------------------------------------------------------------------------------");
+            System.out.printf("| %-25s | %-12s | %-12s | %-10s | %-12s | %-8s |\n", 
+                              "Course Name", "Category", "Enrolled Date", "Status", "Payment Method", "Amount");
+            System.out.println("--------------------------------------------------------------------------------------------------");
+            while (rs.next()) {
+                String courseName = rs.getString("course_name");
+                String category = rs.getString("category");
+                String enrollDate = rs.getTimestamp("enrollment_date").toString().substring(0, 10);
+                String status = rs.getString("payment_status");
+                String method = rs.getString("payment_method");
+                double amount = rs.getDouble("amount");
+
+                if (method == null) {
+                    method = "N/A";
+                    amount = 0.0;
+                }
+
+                System.out.printf("| %-25s | %-12s | %-12s | %-10s | %-12s | $%-7.2f |\n",
+                                  courseName, category, enrollDate, status, method, amount);
+            }
+            System.out.println("--------------------------------------------------------------------------------------------------");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
